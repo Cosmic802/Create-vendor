@@ -1,1 +1,29 @@
 
+#!/sbin/sh
+umask 022
+OOTFD=$2
+ZIPFILE=$3
+
+# TWRP дэлгэцэнд мэдээлэл хэвлэх функц
+ui_print() {
+  echo -e "ui_print $1\nui_print" > /proc/self/fd/$OOTFD
+}
+
+ui_print "================================="
+ui_print " Installing Vendor Package... "
+ui_print "================================="
+
+# Vendor партишныг mount хийх
+mount /vendor 2>/dev/null || mount /dev/block/bootdevice/by-name/vendor /vendor
+
+# Файлуудыг хуулах
+ui_print "Extracting vendor files..."
+unzip -o "$ZIPFILE" 'vendor/*' -d /
+
+# Эрх тохируулах болон unmount хийх
+chmod -R 755 /vendor
+sync
+ummount /vendor 2>/dev/null
+
+ui_print "Done!"
+exit 0
